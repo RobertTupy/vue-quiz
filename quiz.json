@@ -1,0 +1,27 @@
+{
+  "quiz preamble": "something to say before quiz start",
+  "quiz author": "my name",
+  "questions": [
+    {
+      "question": "anything to ask?",
+      "options": [
+        {
+          "option": "blah",
+          "correct": false
+        },
+        {
+          "option": "yes",
+          "correct": true
+        },
+        {
+          "option": "also yes",
+          "correct": true
+        }
+      ]
+    },
+    {
+      "question": "question without option should not crash app",
+      "options": []
+    }
+  ]
+}
