@@ -1,20 +1,24 @@
 <script setup>
-import { RouterLink, RouterView } from "vue-router";
+import { RouterLink, RouterView, useRoute } from "vue-router";
+import { computed } from "vue";
+
+const route = useRoute();
+const selectedMenu = computed(() => [route.name]);
 </script>
 
 <template>
   <a-layout>
     <a-layout-header>
-      <a-menu mode="horizontal" theme="dark">
+      <a-menu :selected-keys="selectedMenu" mode="horizontal" theme="dark">
         <nav>
-          <a-menu-item key="task"
-            ><RouterLink to="/">Task</RouterLink></a-menu-item
-          >
+          <a-menu-item key="task">
+            <RouterLink to="/">Task</RouterLink>
+          </a-menu-item>
         </nav>
         <nav>
-          <a-menu-item key="quiz"
-            ><RouterLink to="/quiz">Quiz</RouterLink></a-menu-item
-          >
+          <a-menu-item key="quiz">
+            <RouterLink to="/quiz">Quiz</RouterLink>
+          </a-menu-item>
         </nav>
         <nav>
           <a-menu-item key="vue-welcome"
