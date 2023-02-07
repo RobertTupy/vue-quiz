@@ -13,6 +13,7 @@
       type="primary"
       @click.prevent="nextQuestion"
       :disabled="disableNextButton"
+      :style="{ marginTop: '15px' }"
     >
       <span v-if="isFinal">Finish quiz</span>
       <span v-else>Next question</span>
