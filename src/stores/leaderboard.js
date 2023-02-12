@@ -6,7 +6,8 @@ export const useLeaderBoardStore = defineStore("quizLeaderboard", {
   }),
   getters: {
     getResultsByQuiz(state) {
-      return (quizId) => state.leaderboard.filter(quizResult => quizResult.quizId === quizId)
+      return (quizId) =>
+        state.leaderboard.filter((quizResult) => quizResult.quizId === quizId);
     },
   },
   actions: {
@@ -14,11 +15,13 @@ export const useLeaderBoardStore = defineStore("quizLeaderboard", {
       this.leaderboard.push(result);
     },
     clear(quizId) {
-      this.leaderboard = this.leaderboard.filter(quizResult => quizResult.quizId !== quizId)
+      this.leaderboard = this.leaderboard.filter(
+        (quizResult) => quizResult.quizId !== quizId
+      );
     },
   },
   persist: {
     enabled: true,
-    strategies: []
-  }
+    strategies: [],
+  },
 });

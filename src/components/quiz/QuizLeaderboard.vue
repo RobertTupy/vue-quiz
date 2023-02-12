@@ -1,5 +1,5 @@
-<template key="{{quizId}}">
-  <a-card title="Leaderboard" hoverable>
+<template>
+  <a-card key="{{quizId}}" title="Leaderboard" hoverable>
     <a-row v-if="sortedResults.length > 0">
       <a-col :span="4">Score</a-col>
       <a-col :span="6">Duration</a-col>
@@ -49,7 +49,7 @@ export default {
   data() {
     return {
       showResults: 5,
-      leaderboard: getResultsByQuiz(this.quizId)
+      leaderboard: getResultsByQuiz(this.quizId),
     };
   },
   methods: {
@@ -61,7 +61,7 @@ export default {
     },
     purgeResults() {
       clear(this.quizId);
-      this.leaderboard = getResultsByQuiz(this.quizId)
+      this.leaderboard = getResultsByQuiz(this.quizId);
     },
   },
   computed: {

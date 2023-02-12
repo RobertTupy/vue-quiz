@@ -1,14 +1,14 @@
 <template>
   <a-alert
-      v-if="error"
-      message="Error"
-      description={{error}}
-      type="error"
-      show-icon
-      :class="quiz"
+    v-if="error"
+    message="Error"
+    description="{{error}}"
+    type="error"
+    show-icon
+    :class="quiz"
   />
-  <a-spin v-if="loading" >
-    <a-layout :style="{ height: '200px', }" />
+  <a-spin v-if="loading">
+    <a-layout :style="{ height: '200px' }" />
   </a-spin>
   <template v-if="quiz">
     <a-layout v-if="!started" :class="quiz">
@@ -51,28 +51,28 @@
       </a-layout-footer>
     </a-layout>
     <a-layout v-if="result" :style="{ padding: '5px 24px' }">
-    <a-layout-content>
-      <a-layout>
-        <a-layout-content>
-          <QuizResult
-            v-if="result"
-            v-bind="result"
-            key="[{{result.quizId}}+{{result.finishedAt}}]"
-          />
-        </a-layout-content>
-        <a-layout-sider
-          v-if=[quiz.id]
-          :width="300"
-          :style="{ background: 'transparent' }"
-        >
-          <QuizLeaderBoard :quizId="quiz.id" />
-        </a-layout-sider>
-      </a-layout>
-    </a-layout-content>
-    <a-layout-footer>
-      <a-button type="primary" @click="restart">Restart</a-button>
-    </a-layout-footer>
-  </a-layout>
+      <a-layout-content>
+        <a-layout>
+          <a-layout-content>
+            <QuizResult
+              v-if="result"
+              v-bind="result"
+              key="[{{result.quizId}}+{{result.finishedAt}}]"
+            />
+          </a-layout-content>
+          <a-layout-sider
+            v-if="[quiz.id]"
+            :width="300"
+            :style="{ background: 'transparent' }"
+          >
+            <QuizLeaderBoard :quizId="quiz.id" />
+          </a-layout-sider>
+        </a-layout>
+      </a-layout-content>
+      <a-layout-footer>
+        <a-button type="primary" @click="restart">Restart</a-button>
+      </a-layout-footer>
+    </a-layout>
   </template>
 </template>
 
@@ -84,17 +84,17 @@ import QuizQuestion from "../components/quiz/QuizQuestion.vue";
 import QuizResult from "../components/quiz/QuizResult.vue";
 import QuizLeaderBoard from "../components/quiz/QuizLeaderboard.vue";
 import axios from "axios";
-import {useLeaderBoardStore} from "../stores/leaderboard";
+import { useLeaderBoardStore } from "../stores/leaderboard";
 
-const { addResult, getResultsByQuiz } = useLeaderBoardStore()
+const { addResult, getResultsByQuiz } = useLeaderBoardStore();
 
 function percent(actual, total) {
   return Math.round((actual / total) * 100);
 }
 
 function holdOn(ms) {
-  return function(x) {
-    return new Promise(resolve => setTimeout(() => resolve(x), ms));
+  return function (x) {
+    return new Promise((resolve) => setTimeout(() => resolve(x), ms));
   };
 }
 
@@ -176,8 +176,8 @@ export default {
       this.$refs.CurrentQuestion.resetSelected();
     },
     currentQuizResults() {
-      return getResultsByQuiz(this.quiz.id)
-    }
+      return getResultsByQuiz(this.quiz.id);
+    },
   },
   computed: {
     total() {
@@ -199,32 +199,33 @@ export default {
     },
     isFinal() {
       return this.qCounter + 1 >= this.quiz.questions.length;
-    }
+    },
   },
   async created() {
-    axios.get("/quiz.json")
-        .then(response => response.data)
-        .then(holdOn(1000))
-        .then(q => {
-          this.loading = false
-          this.quiz = {
-            ...q,
-            id: q.id ?? md5(JSON.stringify(q)),
-            questions: q.questions.map(function (question) {
-              return {
-                ...question,
-                id: question.id ?? md5(JSON.stringify(question)),
-              };
-            }),
-          }
-        })
-        .catch(error => this.error = 'Error while getting quiz' + `${error}`)
-  }
+    axios
+      .get("/quiz.json")
+      .then((response) => response.data)
+      .then(holdOn(1000))
+      .then((q) => {
+        this.loading = false;
+        this.quiz = {
+          ...q,
+          id: q.id ?? md5(JSON.stringify(q)),
+          questions: q.questions.map(function (question) {
+            return {
+              ...question,
+              id: question.id ?? md5(JSON.stringify(question)),
+            };
+          }),
+        };
+      })
+      .catch((error) => (this.error = "Error while getting quiz" + `${error}`));
+  },
 };
 </script>
 
 <style>
 .quiz {
-  min-height: 200px
+  min-height: 200px;
 }
 </style>
