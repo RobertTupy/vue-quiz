@@ -1,44 +1,56 @@
 <template>
-  <a-layout v-if="!started">
-    <a-layout-content :style="{ padding: '5px 24px' }">
-      <h2>
-        Quiz: {{ quiz.title
-        }}<span v-if="quiz.author"> by {{ quiz.author }}</span>
-      </h2>
-      <div>{{ quiz.preamble }}</div>
-    </a-layout-content>
-    <a-layout-footer v-if="!finished">
-      <a-button type="primary" @click="start">Start quiz</a-button>
-    </a-layout-footer>
-  </a-layout>
-  <a-layout v-if="started && !finished">
-    <a-layout-content :style="{ padding: '5px 24px' }">
-      <QuizQuestion
-        key="{{currentQuestion.id}}"
-        ref="CurrentQuestion"
-        :id="currentQuestion.id"
-        :question="currentQuestion.question"
-        :answers="currentQuestion.answers"
-        :submit-handler="answerQuestion"
-        :is-final="isFinal"
-      />
-    </a-layout-content>
-    <a-layout-footer :style="{ padding: '5px 24px' }">
-      <a-row type="flex">
-        <a-col :flex="1" style="text-align: center">
-          {{ qCounter + 1 }}/{{ total }}
-        </a-col>
-        <a-col :flex="11">
-          <a-progress
-            :percent="percentCompleted"
-            status="active"
-            :show-info="false"
-          />
-        </a-col>
-      </a-row>
-    </a-layout-footer>
-  </a-layout>
-  <a-layout v-if="result" :style="{ padding: '5px 24px' }">
+  <a-alert
+      v-if="error"
+      message="Error"
+      description={{error}}
+      type="error"
+      show-icon
+      :class="quiz"
+  />
+  <a-spin v-if="loading" >
+    <a-layout :style="{ height: '200px', }" />
+  </a-spin>
+  <template v-if="quiz">
+    <a-layout v-if="!started" :class="quiz">
+      <a-layout-content :style="{ padding: '5px 24px' }">
+        <h2>
+          Quiz: {{ quiz.title
+          }}<span v-if="quiz.author"> by {{ quiz.author }}</span>
+        </h2>
+        <div>{{ quiz.preamble }}</div>
+      </a-layout-content>
+      <a-layout-footer v-if="!finished">
+        <a-button type="primary" @click="start">Start quiz</a-button>
+      </a-layout-footer>
+    </a-layout>
+    <a-layout v-if="started && !finished">
+      <a-layout-content :style="{ padding: '5px 24px' }">
+        <QuizQuestion
+          key="{{currentQuestion.id}}"
+          ref="CurrentQuestion"
+          :id="currentQuestion.id"
+          :question="currentQuestion.question"
+          :answers="currentQuestion.answers"
+          :submit-handler="answerQuestion"
+          :is-final="isFinal"
+        />
+      </a-layout-content>
+      <a-layout-footer :style="{ padding: '5px 24px' }">
+        <a-row type="flex">
+          <a-col :flex="1" style="text-align: center">
+            {{ qCounter + 1 }}/{{ total }}
+          </a-col>
+          <a-col :flex="11">
+            <a-progress
+              :percent="percentCompleted"
+              status="active"
+              :show-info="false"
+            />
+          </a-col>
+        </a-row>
+      </a-layout-footer>
+    </a-layout>
+    <a-layout v-if="result" :style="{ padding: '5px 24px' }">
     <a-layout-content>
       <a-layout>
         <a-layout-content>
@@ -61,6 +73,7 @@
       <a-button type="primary" @click="restart">Restart</a-button>
     </a-layout-footer>
   </a-layout>
+  </template>
 </template>
 
 <script>
@@ -70,56 +83,16 @@ import _ from "underscore";
 import QuizQuestion from "../components/quiz/QuizQuestion.vue";
 import QuizResult from "../components/quiz/QuizResult.vue";
 import QuizLeaderBoard from "../components/quiz/QuizLeaderboard.vue";
-
-const q = {
-  title: "Quiz title",
-  preamble: "something to say before quiz start",
-  author: "my name",
-  questions: [
-    {
-      question: "anything to ask?",
-      answers: [
-        {
-          value: "blah",
-          correct: false,
-        },
-        {
-          value: "yes",
-          correct: true,
-        },
-        {
-          value: "also yes",
-          correct: true,
-        },
-      ],
-    },
-    {
-      question: "question without option should not crash app",
-      answers: [
-        {
-          value: "it doesn't",
-          correct: true,
-        },
-      ],
-    },
-    {
-      question: "q3",
-      answers: [
-        {
-          value: "wrong",
-          correct: false,
-        },
-        {
-          value: "false",
-          correct: false,
-        },
-      ],
-    },
-  ],
-};
+import axios from "axios";
 
 function percent(actual, total) {
   return Math.round((actual / total) * 100);
+}
+
+function holdOn(ms) {
+  return function(x) {
+    return new Promise(resolve => setTimeout(() => resolve(x), ms));
+  };
 }
 
 export default {
@@ -132,16 +105,9 @@ export default {
       leaderBoard: [],
       qCounter: 0,
       answered: {},
-      quiz: {
-        ...q,
-        id: q.id ?? md5(JSON.stringify(q)),
-        questions: q.questions.map(function (question) {
-          return {
-            ...question,
-            id: question.id ?? md5(JSON.stringify(question)),
-          };
-        }),
-      },
+      loading: true,
+      error: null,
+      quiz: null,
     };
   },
   methods: {
@@ -233,5 +199,30 @@ export default {
       return this.qCounter + 1 >= this.quiz.questions.length;
     },
   },
+  async created() {
+    axios.get("/quiz.json")
+        .then(response => response.data)
+        .then(holdOn(1000))
+        .then(q => {
+          this.loading = false
+          this.quiz = {
+            ...q,
+            id: q.id ?? md5(JSON.stringify(q)),
+            questions: q.questions.map(function (question) {
+              return {
+                ...question,
+                id: question.id ?? md5(JSON.stringify(question)),
+              };
+            }),
+          }
+        })
+        .catch(error => this.error = 'Error while getting quiz' + `${error}`)
+  }
 };
 </script>
+
+<style>
+.quiz {
+  min-height: 200px
+}
+</style>

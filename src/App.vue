@@ -7,7 +7,7 @@ const selectedMenu = computed(() => [route.name]);
 </script>
 
 <template>
-  <a-layout>
+  <a-layout class="quiz-app">
     <a-layout-header>
       <a-menu :selected-keys="selectedMenu" mode="horizontal" theme="dark">
         <nav>
@@ -46,7 +46,10 @@ const selectedMenu = computed(() => [route.name]);
   </a-layout>
 </template>
 
-<style scoped>
+<style>
+.quiz-app {
+  min-height: 240px;
+}
 .disclaimer {
   text-align: center;
 }

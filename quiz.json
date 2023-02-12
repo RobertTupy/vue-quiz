@@ -1,27 +1,46 @@
 {
-  "quiz preamble": "something to say before quiz start",
-  "quiz author": "my name",
+  "title": "Quiz title",
+  "preamble": "something to say before quiz start",
+  "author": "my name",
   "questions": [
     {
       "question": "anything to ask?",
-      "options": [
+      "answers": [
         {
-          "option": "blah",
+          "value": "blah",
           "correct": false
         },
         {
-          "option": "yes",
+          "value": "yes",
           "correct": true
         },
         {
-          "option": "also yes",
+          "value": "also yes",
           "correct": true
         }
       ]
     },
     {
       "question": "question without option should not crash app",
-      "options": []
+      "answers": [
+        {
+          "value": "it doesn't",
+          "correct": true
+        }
+      ]
+    },
+    {
+      "question": "q3",
+      "answers": [
+        {
+          "value": "wrong",
+          "correct": false
+        },
+        {
+          "value": "false",
+          "correct": false
+        }
+      ]
     }
   ]
 }
