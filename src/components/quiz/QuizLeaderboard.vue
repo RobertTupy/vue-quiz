@@ -1,6 +1,6 @@
-<template>
-  <a-card title="Leaderboard">
-    <a-row>
+<template key="{{quizId}}">
+  <a-card title="Leaderboard" hoverable>
+    <a-row v-if="sortedResults.length > 0">
       <a-col :span="4">Score</a-col>
       <a-col :span="6">Duration</a-col>
       <a-col :span="12">Finished at</a-col>
@@ -10,12 +10,18 @@
       <a-col :span="6">{{ rtf(result.duration) }}</a-col>
       <a-col :span="12">{{ formatDate(result.finishedAt) }}</a-col>
     </a-row>
+    <template #actions v-if="sortedResults.length > 0">
+      <a-button type="primary" danger @click="purgeResults">clear</a-button>
+    </template>
   </a-card>
 </template>
 
 <script>
 import * as humanizeDuration from "humanize-duration";
 import { toRaw } from "vue";
+import { useLeaderBoardStore } from "../../stores/leaderboard";
+
+const { getResultsByQuiz, clear } = useLeaderBoardStore();
 
 const formatDuration = humanizeDuration.humanizer({
   language: "en",
@@ -39,10 +45,11 @@ function compareResults(a, b) {
 }
 
 export default {
-  props: ["leaderboard"],
+  props: ["quizId"],
   data() {
     return {
       showResults: 5,
+      leaderboard: getResultsByQuiz(this.quizId)
     };
   },
   methods: {
@@ -51,6 +58,10 @@ export default {
     },
     formatDate(date) {
       return new Date(date).toLocaleTimeString();
+    },
+    purgeResults() {
+      clear(this.quizId);
+      this.leaderboard = getResultsByQuiz(this.quizId)
     },
   },
   computed: {

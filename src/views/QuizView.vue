@@ -61,11 +61,11 @@
           />
         </a-layout-content>
         <a-layout-sider
-          v-if="leaderBoard"
+          v-if=[quiz.id]
           :width="300"
           :style="{ background: 'transparent' }"
         >
-          <QuizLeaderBoard :leaderboard="leaderBoard" />
+          <QuizLeaderBoard :quizId="quiz.id" />
         </a-layout-sider>
       </a-layout>
     </a-layout-content>
@@ -84,6 +84,9 @@ import QuizQuestion from "../components/quiz/QuizQuestion.vue";
 import QuizResult from "../components/quiz/QuizResult.vue";
 import QuizLeaderBoard from "../components/quiz/QuizLeaderboard.vue";
 import axios from "axios";
+import {useLeaderBoardStore} from "../stores/leaderboard";
+
+const { addResult, getResultsByQuiz } = useLeaderBoardStore()
 
 function percent(actual, total) {
   return Math.round((actual / total) * 100);
@@ -102,7 +105,6 @@ export default {
       started: null,
       finished: null,
       result: null,
-      leaderBoard: [],
       qCounter: 0,
       answered: {},
       loading: true,
@@ -159,7 +161,7 @@ export default {
       };
       this.finished = duration;
       this.result = currentResult;
-      this.addLeaderboardResult(currentResult);
+      addResult(currentResult);
     },
     answerQuestion(answer, questionId) {
       this.answered = {
@@ -173,9 +175,9 @@ export default {
       }
       this.$refs.CurrentQuestion.resetSelected();
     },
-    addLeaderboardResult(result) {
-      this.leaderBoard.push(result);
-    },
+    currentQuizResults() {
+      return getResultsByQuiz(this.quiz.id)
+    }
   },
   computed: {
     total() {
@@ -197,7 +199,7 @@ export default {
     },
     isFinal() {
       return this.qCounter + 1 >= this.quiz.questions.length;
-    },
+    }
   },
   async created() {
     axios.get("/quiz.json")
